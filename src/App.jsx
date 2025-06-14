@@ -4,8 +4,9 @@ import {
   Routes,
   Route,
   useLocation,
+  Navigate,
 } from "react-router-dom";
-import { AuthProvider } from "./Pages/AuthContext"; // Add this import
+import { AuthProvider, useAuth } from "./Pages/AuthContext";
 import Navbar from "./components/Navbar/Navbar";
 import Hero from "./components/Hero/Hero";
 import Programs from "./components/Programs/Programs";
@@ -22,7 +23,88 @@ import ViewProjectStatus from "./Pages/ViewProjectStatus";
 import MaterialListing from "./Pages/MaterialListing";
 import CostEstimator from "./Pages/CostEstimator";
 import VerifyEmail from "./Pages/VerifyEmail";
-import ContractorDashboard from "./Pages/ContractorDashboard"; // Fixed import name
+import ContractorDashboard from "./Pages/ContractorDashboard";
+import AdminDashboard from "./Pages/AdminDashboard"; // Add this import
+
+// Protected Route Component for Admin
+const AdminProtectedRoute = ({ children }) => {
+  const { user, userData, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh' 
+      }}>
+        <div>Loading...</div>
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (userData?.userType !== 'admin') {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
+
+// Protected Route Component for Contractor
+const ContractorProtectedRoute = ({ children }) => {
+  const { user, userData, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh' 
+      }}>
+        <div>Loading...</div>
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (userData?.userType !== 'contractor') {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
+
+// General Protected Route Component (for any authenticated user)
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh' 
+      }}>
+        <div>Loading...</div>
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return children;
+};
 
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -32,8 +114,8 @@ const Layout = ({ children }) => {
     "/login", 
     "/forgot-password", 
     "/reset-password",
-    "/contractor-dashboard", // Hide navbar/footer on contractor dashboard
-    "/admin-dashboard" // Hide navbar/footer on admin dashboard (if you create one)
+    "/contractor-dashboard",
+    "/admin-dashboard"
   ];
 
   return (
@@ -45,73 +127,124 @@ const Layout = ({ children }) => {
   );
 };
 
+const AppRoutes = () => {
+  return (
+    <Layout>
+      <Routes>
+        {/* Home Route */}
+        <Route
+          path="/"
+          element={
+            <>
+              <Hero />
+              <div className="container">
+                <Title subTitle="Our Services" title="What We Offer" />
+                <Programs />
+                <Title subTitle="Contact Us" title="Get in Touch" />
+                <Contact />
+              </div>
+            </>
+          }
+        />
+
+        {/* Public Auth Routes */}
+        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
+        {/* Protected Routes for any authenticated user */}
+        <Route 
+          path="/view-project-status" 
+          element={
+            <ProtectedRoute>
+              <ViewProjectStatus />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/material-listing" 
+          element={
+            <ProtectedRoute>
+              <MaterialListing />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Contractor Protected Routes */}
+        <Route 
+          path="/contractor-dashboard" 
+          element={
+            <ContractorProtectedRoute>
+              <ContractorDashboard />
+            </ContractorProtectedRoute>
+          } 
+        />
+
+        {/* Admin Protected Routes */}
+        <Route 
+          path="/admin-dashboard" 
+          element={
+            <AdminProtectedRoute>
+              <AdminDashboard />
+            </AdminProtectedRoute>
+          } 
+        />
+        
+        {/* Legacy admin route - redirect to admin-dashboard */}
+        <Route 
+          path="/admin" 
+          element={<Navigate to="/admin-dashboard" replace />} 
+        />
+
+        {/* Tender Routes */}
+        <Route
+          path="/tender"
+          element={
+            <ProtectedRoute>
+              <div className="container">
+                <TenderForm />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tender-dashboard"
+          element={
+            <ProtectedRoute>
+              <div className="container">
+                <TenderDashboard />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Cost Estimator Route */}
+        <Route
+          path="/cost-estimator"
+          element={
+            <ProtectedRoute>
+              <div className="container">
+                <CostEstimator />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch all route - redirect to home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Layout>
+  );
+};
+
 const App = () => {
   return (
     <Router>
-      <AuthProvider> {/* Wrap everything with AuthProvider */}
-        <Layout>
-          <Routes>
-            {/* Home Route */}
-            <Route
-              path="/"
-              element={
-                <>
-                  <Hero />
-                  <div className="container">
-                    <Title subTitle="Our Services" title="What We Offer" />
-                    <Programs />
-                    <Title subTitle="Contact Us" title="Get in Touch" />
-                    <Contact />
-                  </div>
-                </>
-              }
-            />
-
-            {/* Auth Routes */}
-            <Route path="/verify-email" element={<VerifyEmail />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/view-project-status" element={<ViewProjectStatus />} />
-            <Route path="/material-listing" element={<MaterialListing />} />
-
-            {/* Dashboard Routes */}
-            <Route path="/contractor-dashboard" element={<ContractorDashboard />} />
-            <Route path="/admin" element={<ContractorDashboard />} /> {/* Keep this for backward compatibility */}
-            {/* You can create a separate AdminDashboard component later */}
-            <Route path="/admin-dashboard" element={<ContractorDashboard />} />
-
-            {/* Tender Routes */}
-            <Route
-              path="/tender"
-              element={
-                <div className="container">
-                  <TenderForm />
-                </div>
-              }
-            />
-
-            <Route
-              path="/tender-dashboard"
-              element={
-                <div className="container">
-                  <TenderDashboard />
-                </div>
-              }
-            />
-
-            {/* Cost Estimator Route */}
-            <Route
-              path="/cost-estimator"
-              element={
-                <div className="container">
-                  <CostEstimator />
-                </div>
-              }
-            />
-          </Routes>
-        </Layout>
+      <AuthProvider>
+        <AppRoutes />
       </AuthProvider>
     </Router>
   );

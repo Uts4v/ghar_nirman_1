@@ -1,0 +1,125 @@
+.admin-dashboard {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f5f7fa;
+}
+
+.dashboard-container {
+  display: flex;
+  flex: 1;
+}
+
+.sidebar {
+  width: 250px;
+  background: #2c3e50;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.profile-card {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.avatar {
+  background-color: #34495e;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  color: white;
+  font-weight: bold;
+}
+
+.dashboard-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dashboard-nav ul li {
+  padding: 12px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  transition: background-color 0.3s;
+}
+
+.dashboard-nav ul li:hover,
+.dashboard-nav ul li.active {
+  background-color: #34495e;
+}
+
+.dashboard-nav ul li i {
+  margin-right: 10px;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 2rem;
+  background: white;
+}
+
+.dashboard-header h1 {
+  font-size: 28px;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.stats-container {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: #ecf0f1;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  flex: 1;
+  min-width: 150px;
+  text-align: center;
+}
+
+.stat-card h3 {
+  margin: 0 0 10px;
+  font-weight: 600;
+  color: #34495e;
+}
+
+.stat-card p {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.dashboard-section {
+  margin-bottom: 2rem;
+}
+
+.dashboard-section h2 {
+  color: #2c3e50;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.feature-list {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.feature-list li {
+  margin-bottom: 8px;
+  color: #34495e;
+  font-weight: 500;
+}

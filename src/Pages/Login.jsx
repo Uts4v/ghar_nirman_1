@@ -63,6 +63,7 @@ const Login = () => {
 
   // Function to redirect based on user type
   const redirectBasedOnUserType = (userType) => {
+    console.log('Redirecting user type:', userType);
     switch (userType) {
       case 'contractor':
         navigate('/contractor-dashboard');
@@ -71,8 +72,6 @@ const Login = () => {
         navigate('/admin-dashboard');
         break;
       case 'homeowner':
-        navigate('/');
-        break;
       default:
         navigate('/');
     }
@@ -103,8 +102,10 @@ const Login = () => {
       
       // Check if the selected user type matches the registered user type
       if (userData.userType !== userType) {
+        // Sign out the user since they selected wrong user type
+        await auth.signOut();
         toast.error(`This account is registered as a ${userData.userType}, not a ${userType}. Please select the correct user type.`);
-        return { success: false, user: null, reason: "Your user type is incorrect" };
+        return { success: false, user: null, reason: "incorrect_user_type" };
       }
 
       return { success: true, user, userData };
@@ -178,7 +179,7 @@ const Login = () => {
       localStorage.setItem("authToken", token);
 
       if (rememberMe) {
-        localStorage.setItem("rememberedUser", JSON.stringify({ email, userType }));
+        localStorage.setItem("rememberedUser", JSON.stringify({ email, userType: result.userData.userType }));
       } else {
         localStorage.removeItem("rememberedUser");
       }
@@ -188,7 +189,7 @@ const Login = () => {
       redirectBasedOnUserType(result.userData.userType);
       
     } catch (err) {
-      console.error(err.message);
+      console.error("Login error:", err.message);
       setError(err.message);
       toast.error(err.message);
     } finally {
