@@ -73,7 +73,7 @@ const Login = () => {
         break;
       case 'homeowner':
       default:
-        navigate('/');
+        navigate('/homeowner-dashboard'); // Changed from '/' to '/homeowner-dashboard'
     }
   };
 

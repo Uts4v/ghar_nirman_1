@@ -24,7 +24,36 @@ import MaterialListing from "./Pages/MaterialListing";
 import CostEstimator from "./Pages/CostEstimator";
 import VerifyEmail from "./Pages/VerifyEmail";
 import ContractorDashboard from "./Pages/ContractorDashboard";
-import AdminDashboard from "./Pages/AdminDashboard"; // Add this import
+import AdminDashboard from "./Pages/AdminDashboard";
+import HomeownerDashboard from "./Pages/HomeownerDashboard"; // Add this import
+
+// Protected Route Component for Homeowner
+const HomeownerProtectedRoute = ({ children }) => {
+  const { user, userData, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh' 
+      }}>
+        <div>Loading...</div>
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (userData?.userType !== 'homeowner') {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
 
 // Protected Route Component for Admin
 const AdminProtectedRoute = ({ children }) => {
@@ -115,7 +144,8 @@ const Layout = ({ children }) => {
     "/forgot-password", 
     "/reset-password",
     "/contractor-dashboard",
-    "/admin-dashboard"
+    "/admin-dashboard",
+    "/homeowner-dashboard" // Add homeowner dashboard to hidden navbar routes
   ];
 
   return (
@@ -154,21 +184,13 @@ const AppRoutes = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
-        {/* Protected Routes for any authenticated user */}
+        {/* Homeowner Protected Routes */}
         <Route 
-          path="/view-project-status" 
+          path="/homeowner-dashboard" 
           element={
-            <ProtectedRoute>
-              <ViewProjectStatus />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/material-listing" 
-          element={
-            <ProtectedRoute>
-              <MaterialListing />
-            </ProtectedRoute>
+            <HomeownerProtectedRoute>
+              <HomeownerDashboard />
+            </HomeownerProtectedRoute>
           } 
         />
 
@@ -196,6 +218,24 @@ const AppRoutes = () => {
         <Route 
           path="/admin" 
           element={<Navigate to="/admin-dashboard" replace />} 
+        />
+
+        {/* Protected Routes for any authenticated user */}
+        <Route 
+          path="/view-project-status" 
+          element={
+            <ProtectedRoute>
+              <ViewProjectStatus />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/material-listing" 
+          element={
+            <ProtectedRoute>
+              <MaterialListing />
+            </ProtectedRoute>
+          } 
         />
 
         {/* Tender Routes */}
